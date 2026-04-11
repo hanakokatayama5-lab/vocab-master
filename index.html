@@ -169,6 +169,30 @@
             font-size: 2rem;
             color: var(--primary);
             word-break: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .speak-btn {
+            background: #eef2ff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .speak-btn:active {
+            transform: scale(0.9);
+            background: #d0d7ff;
         }
 
         .card-back h2 {
@@ -238,11 +262,14 @@
         </div>
     </div>
 
-    <div class="flashcard-area">
+<div class="flashcard-area">
         <div class="card" id="card">
             <div class="card-face card-front">
                 <span class="category-tag" id="current-category">-</span>
-                <h2 id="word-display">Starting...</h2>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <h2 id="word-display">Starting...</h2>
+                    <button id="speak-btn-area" class="speak-btn" onclick="event.stopPropagation(); speakWord();">🔊</button>
+                </div>
                 <div class="hint">タップで確認</div>
             </div>
             <div class="card-face card-back">
@@ -409,12 +436,26 @@
         if (saved) masteredWords = JSON.parse(saved);
     } catch(e) {}
 
+    function speakWord() {
+        var item = currentFilteredList[currentIndex];
+        if (!item || !window.speechSynthesis) return;
+        
+        // Cancel any pending speech
+        window.speechSynthesis.cancel();
+        
+        var uttr = new SpeechSynthesisUtterance(item.word);
+        uttr.lang = 'en-US';
+        uttr.rate = 0.9; // Slightly slower for clarity
+        window.speechSynthesis.speak(uttr);
+    }
+
     function updateCard() {
         var card = document.getElementById('card');
         card.className = "card";
         if (currentFilteredList.length === 0) {
             document.getElementById('word-display').innerHTML = "No Words";
             document.getElementById('meaning-display').innerHTML = "条件に合う単語がありません";
+            document.getElementById('speak-btn-area').style.display = 'none';
             return;
         }
         var item = currentFilteredList[currentIndex];
@@ -427,6 +468,9 @@
         document.getElementById('meaning-display').innerHTML = backText;
         document.getElementById('current-category').innerHTML = item.category + (masteredWords[item.word] ? " ✅" : "");
         
+        // Only show speaker on English side
+        document.getElementById('speak-btn-area').style.display = isEnToJp ? 'flex' : 'none';
+
         var hintEls = document.getElementsByClassName('hint');
         if (hintEls.length >= 2) {
             hintEls[0].innerHTML = frontHint;
