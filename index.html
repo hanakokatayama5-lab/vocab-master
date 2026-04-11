@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>English Vocabulary Flashcards - レッスン復習</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: #1e293b;
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+        }
+
+        header p {
+            color: #cbd5e1;
+            font-size: 0.8rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.2rem;
+            justify-content: center;
+        }
+
+        select, button {
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        button.primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            background: white;
+            padding: 1rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+        }
+
+        .flashcard-area {
+            perspective: 1000px;
+            margin-bottom: 2rem;
+            height: 320px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s;
+            cursor: pointer;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            background: white;
+        }
+
+        .card-back {
+            background: #f0f4ff;
+            transform: rotateY(180deg);
+            border: 1px solid var(--primary);
+        }
+
+        .category-tag {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: #f1f5f9;
+            padding: 0.4rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+        }
+
+        .card-face h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            word-break: break-word;
+        }
+
+        .card-back h2 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .hint {
+            margin-top: 1.5rem;
+            color: var(--text-sub);
+            font-size: 0.8rem;
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 10px;
+        }
+
+        .nav-buttons button {
+            height: 55px;
+            font-weight: bold;
+        }
+
+        footer {
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.7rem;
+        }
+
+        @media (max-width: 480px) {
+            .nav-buttons { grid-template-columns: 1fr 1fr; }
+            .nav-buttons button:nth-child(2) { grid-column: span 2; order: -1; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Vocabulary Master</h1>
+    <p>自分のことを英語で話すための要復習リスト</p>
+</header>
+
+<div class="container">
+    <div class="controls">
+        <select id="category-filter">
+            <option value="all">すべて</option>
+        </select>
+        <button id="mode-btn">英⇄日</button>
+        <button id="shuffle-btn">🔀</button>
+        <button id="reset-btn">🔄</button>
+    </div>
+    <div class="controls">
+        <label style="font-size: 0.9rem; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="unlearned-only"> 未習得のみ表示
+        </label>
+        <button id="clear-storage-btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; color: var(--text-sub);">記録をリセット</button>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-header">
+            <span id="progress-text">0 / 0</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="flashcard-area">
+        <div class="card" id="card">
+            <div class="card-face card-front">
+                <span class="category-tag" id="current-category">-</span>
+                <h2 id="word-display">Starting...</h2>
+                <div class="hint">タップで確認</div>
+            </div>
+            <div class="card-face card-back">
+                <h2 id="meaning-display">-</h2>
+                <div class="hint">タップで戻る</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button id="prev-btn">◀</button>
+        <button id="mastered-btn" class="primary">覚えた！</button>
+        <button id="next-btn">▶</button>
+    </div>
+</div>
+
+<footer>&copy; 2026 Hanako's English Lessons</footer>
+
+<script>
+    var vocabDataFull = [
+        {"category": "1 自己紹介A", "word": "job", "meaning": "仕事"},
+        {"category": "1 自己紹介A", "word": "big cities", "meaning": "大都市"},
+        {"category": "1 自己紹介A", "word": "outgoing", "meaning": "社交的な"},
+        {"category": "1 自己紹介A", "word": "originally from ~", "meaning": "もともと〜出身"},
+        {"category": "1 自己紹介A", "word": "in the future", "meaning": "将来"},
+        {"category": "1 自己紹介A", "word": "hobbies", "meaning": "趣味"},
+        {"category": "1 自己紹介A", "word": "going out drinking", "meaning": "飲みに行く"},
+        {"category": "1 自己紹介A", "word": "anything you want", "meaning": "あなたが欲しいものは何でも"},
+        {"category": "1 自己紹介A", "word": "married", "meaning": "結婚している"},
+        {"category": "1 自己紹介A", "word": "children", "meaning": "子どもたち　childの複数形"},
+        {"category": "1 自己紹介A", "word": "person", "meaning": "人"},
+        {"category": "1 自己紹介A", "word": "work for a bank", "meaning": "銀行で働く"},
+        {"category": "1 自己紹介A", "word": "though", "meaning": "～だけれども"},
+        {"category": "4 健康B", "word": "in good health", "meaning": "健康で"},
+        {"category": "4 健康B", "word": "healthy", "meaning": "健康な"},
+        {"category": "4 健康B", "word": "bad habits", "meaning": "悪い習慣"},
+        {"category": "4 健康B", "word": "smoke", "meaning": "たばこを吸う"},
+        {"category": "4 健康B", "word": "usually", "meaning": "たいてい、ふだんは"},
+        {"category": "4 健康B", "word": "prefer to", "meaning": "〜するほうを好む"},
+        {"category": "4 健康B", "word": "rather than", "meaning": "〜よりむしろ"},
+        {"category": "4 健康B", "word": "diet", "meaning": "食生活、食事"},
+        {"category": "4 健康B", "word": "skip lunch", "meaning": "昼食を抜く"},
+        {"category": "4 健康B", "word": "skip dinner", "meaning": "夕食を抜く"},
+        {"category": "4 健康B", "word": "for some reason", "meaning": "なぜか"},
+        {"category": "4 健康B", "word": "seem to", "meaning": "〜のように思われる"},
+        {"category": "4 健康B", "word": "get sick", "meaning": "病気になる"},
+        {"category": "4 健康B", "word": "overweight", "meaning": "太りすぎの"},
+        {"category": "4 健康B", "word": "be healthy", "meaning": "健康でいる"},
+        {"category": "4 健康B", "word": "exercise", "meaning": "運動する、運動"},
+        {"category": "4 健康B", "word": "a night", "meaning": "一晩に"},
+        {"category": "4 健康B", "word": "still", "meaning": "まだ"},
+        {"category": "9 食べ物", "word": "many kinds of", "meaning": "いろいろな種類の"},
+        {"category": "9 食べ物", "word": "in fact", "meaning": "実は"},
+        {"category": "9 食べ物", "word": "difficult", "meaning": "難しい"},
+        {"category": "9 食べ物", "word": "favorite", "meaning": "いちばん好きな"},
+        {"category": "9 食べ物", "word": "Western food", "meaning": "洋食"},
+        {"category": "9 食べ物", "word": "sweet", "meaning": "甘い"},
+        {"category": "9 食べ物", "word": "salty", "meaning": "塩辛い"},
+        {"category": "9 食べ物", "word": "spicy", "meaning": "辛い、香辛料のきいた"},
+        {"category": "9 食べ物", "word": "appetite", "meaning": "食欲"},
+        {"category": "9 食べ物", "word": "at one time", "meaning": "一度に"},
+        {"category": "9 食べ物", "word": "tendency", "meaning": "傾向"},
+        {"category": "9 食べ物", "word": "have a tendency to", "meaning": "〜する傾向がある"},
+        {"category": "9 食べ物", "word": "gain weight", "meaning": "体重が増える、太る"},
+        {"category": "9 食べ物", "word": "skip breakfast", "meaning": "朝食を抜く"},
+        {"category": "11 コーヒーA", "word": "first thing in the morning", "meaning": "朝いちばんに、朝起きてすぐに"},
+        {"category": "11 コーヒーA", "word": "get to work", "meaning": "仕事に着く、職場に着く"},
+        {"category": "11 コーヒーA", "word": "during the rest of the day", "meaning": "その日の残りの間ずっと"},
+        {"category": "11 コーヒーA", "word": "have trouble falling asleep", "meaning": "寝つくのに苦労する、寝つきが悪い"},
+        {"category": "11 コーヒーA", "word": "fall asleep", "meaning": "寝つく"},
+        {"category": "11 コーヒーA", "word": "as much as", "meaning": "〜だけたくさん"},
+        {"category": "11 コーヒーA", "word": "prefer", "meaning": "より好む"},
+        {"category": "11 コーヒーA", "word": "blend", "meaning": "ブレンド、混合"},
+        {"category": "11 コーヒーA", "word": "freshly ground coffee", "meaning": "挽きたてのコーヒー"},
+        {"category": "11 コーヒーA", "word": "not only A but also B", "meaning": "AだけでなくBも"},
+        {"category": "11 コーヒーA", "word": "aroma", "meaning": "香り"},
+        {"category": "11 コーヒーA", "word": "hide", "meaning": "隠す"},
+        {"category": "11 コーヒーA", "word": "the real taste", "meaning": "本当の味、本来の味"},
+        {"category": "11 コーヒーB", "word": "in other words", "meaning": "言い換えると"},
+        {"category": "11 コーヒーB", "word": "have become", "meaning": "〜になっている"},
+        {"category": "11 コーヒーB", "word": "for the past three years", "meaning": "この3年間ずっと"},
+        {"category": "11 コーヒーB", "word": "commute", "meaning": "通勤する"},
+        {"category": "11 コーヒーB", "word": "in many ways", "meaning": "いろいろな意味で"},
+        {"category": "11 コーヒーB", "word": "cluttered", "meaning": "散らかった、ごちゃごちゃした"},
+        {"category": "11 コーヒーB", "word": "mobile office", "meaning": "移動式のオフィス、仕事場代わりの場所"},
+        {"category": "11 コーヒーB", "word": "however", "meaning": "しかしながら"},
+        {"category": "11 コーヒーB", "word": "stay in the same shop", "meaning": "同じ店に居続ける"},
+        {"category": "11 コーヒーB", "word": "for a long time", "meaning": "長い間"},
+        {"category": "11 コーヒーB", "word": "move around", "meaning": "あちこち移動する"},
+        {"category": "11 コーヒーB", "word": "a number of", "meaning": "いくつもの、多くの"},
+        {"category": "11 コーヒーB", "word": "owners", "meaning": "店主たち、オーナーたち"},
+        {"category": "11 コーヒーB", "word": "get to know", "meaning": "知り合いになる、だんだん知るようになる"},
+        {"category": "11 コーヒーB", "word": "regular customers", "meaning": "常連客"},
+        {"category": "11 コーヒーB", "word": "in fact", "meaning": "実は"},
+        {"category": "11 コーヒーB", "word": "make friends with", "meaning": "〜と親しくなる、友だちになる"},
+        {"category": "17 旅行A", "word": "traveling", "meaning": "旅行すること、旅行"},
+        {"category": "17 旅行A", "word": "whenever", "meaning": "～するときはいつでも"},
+        {"category": "17 旅行A", "word": "whenever I have the chance", "meaning": "機会があるときはいつでも"},
+        {"category": "17 旅行A", "word": "of course", "meaning": "もちろん"},
+        {"category": "17 旅行A", "word": "a little expensive", "meaning": "少し高い"},
+        {"category": "17 旅行A", "word": "take trips", "meaning": "旅行に行く"},
+        {"category": "17 旅行A", "word": "all the time", "meaning": "いつも、しょっちゅう"},
+        {"category": "17 旅行A", "word": "every month", "meaning": "毎月"},
+        {"category": "17 旅行A", "word": "a short trip", "meaning": "短い旅行"},
+        {"category": "17 旅行A", "word": "somewhere new", "meaning": "どこか新しい場所"},
+        {"category": "17 旅行A", "word": "once a year", "meaning": "年に1回"},
+        {"category": "17 旅行A", "word": "overseas", "meaning": "海外へ、海外に"},
+        {"category": "17 旅行A", "word": "broaden your horizons", "meaning": "視野を広げる"},
+        {"category": "17 旅行A", "word": "the horizon", "meaning": "地平線"},
+        {"category": "17 旅行A", "word": "so far", "meaning": "これまでのところ"},
+        {"category": "17 旅行A", "word": "in the future", "meaning": "将来"},
+        {"category": "17 旅行A", "word": "visit", "meaning": "訪れる"},
+        {"category": "17 旅行A", "word": "perhaps", "meaning": "たぶん、ひょっとすると"},
+        {"category": "17 旅行A", "word": "seem like 〜", "meaning": "〜のように思える"},
+        {"category": "17 旅行A", "word": "place", "meaning": "場所"},
+        {"category": "24 スポーツA", "word": "enjoy watching", "meaning": "見るのを楽しむ"},
+        {"category": "24 スポーツA", "word": "particularly", "meaning": "特に"},
+        {"category": "24 スポーツA", "word": "any sport", "meaning": "どんなスポーツでも"},
+        {"category": "24 スポーツA", "word": "at home", "meaning": "家で"},
+        {"category": "24 スポーツA", "word": "a nice way to relax", "meaning": "くつろぐのによい方法"},
+        {"category": "24 スポーツA", "word": "going out to see", "meaning": "見に出かけること"},
+        {"category": "24 スポーツA", "word": "tournament", "meaning": "トーナメント"},
+        {"category": "24 スポーツA", "word": "halfway", "meaning": "中途半端な"},
+        {"category": "24 スポーツA", "word": "either A or B", "meaning": "AかBのどちらか"},
+        {"category": "24 スポーツA", "word": "win or lose", "meaning": "勝つか負けるか"},
+        {"category": "24 スポーツA", "word": "excuse", "meaning": "言い訳"},
+        {"category": "24 スポーツA", "word": "compromise", "meaning": "妥協"},
+        {"category": "24 スポーツA", "word": "the rest of my life", "meaning": "私の人生のほかの部分"},
+        {"category": "24 スポーツA", "word": "have to", "meaning": "〜しなければならない"},
+        {"category": "24 スポーツA", "word": "deal with", "meaning": "対処する"},
+        {"category": "24 スポーツA", "word": "a lot of nonsense", "meaning": "たくさんのくだらないこと"},
+        {"category": "24 スポーツA", "word": "a release", "meaning": "発散、気晴らし"},
+        {"category": "26 仕事", "word": "reasons why", "meaning": "〜する理由"},
+        {"category": "26 仕事", "word": "get along well with ~", "meaning": "〜と仲良くやっていく、うまく付き合う"},
+        {"category": "26 仕事", "word": "co-workers", "meaning": "同僚"},
+        {"category": "26 仕事", "word": "through", "meaning": "〜を通して"},
+        {"category": "26 仕事", "word": "through my job", "meaning": "仕事を通して"},
+        {"category": "26 仕事", "word": "get to travel", "meaning": "旅行する機会がある、行ける"},
+        {"category": "26 仕事", "word": "many different places", "meaning": "いろいろな場所"},
+        {"category": "26 仕事", "word": "salesperson", "meaning": "営業担当者、販売員"},
+        {"category": "26 仕事", "word": "company", "meaning": "会社"},
+        {"category": "26 仕事", "word": "products", "meaning": "製品、商品"},
+        {"category": "26 仕事", "word": "feel comfortable in", "meaning": "〜に心地よさを感じる、安心して取り組める"},
+        {"category": "26 仕事", "word": "feel", "meaning": "感じる"},
+        {"category": "26 仕事", "word": "comfortable", "meaning": "心地よい"},
+        {"category": "26 仕事", "word": "role as", "meaning": "〜としての役割、立場"},
+        {"category": "26 仕事", "word": "believe in", "meaning": "〜を信じる、価値を信じる"},
+        {"category": "26 仕事", "word": "benefits", "meaning": "福利厚生、手当"},
+        {"category": "26 仕事", "word": "pretty well", "meaning": "かなりよく、十分に"},
+        {"category": "26 仕事", "word": "pay me well", "meaning": "給料がよい、十分に払ってくれる"},
+        {"category": "26 仕事", "word": "complain about ～", "meaning": "〜について文句を言う"},
+        {"category": "26 仕事", "word": "have nothing to complain about", "meaning": "文句を言うことが何もない"}
+    ];
+
+
+    var currentFilteredList = vocabDataFull.slice();
+    var currentIndex = 0;
+    var isEnToJp = true;
+    var masteredWords = {};
+
+    // Load progress
+    try {
+        var saved = localStorage.getItem('mastered_words');
+        if (saved) masteredWords = JSON.parse(saved);
+    } catch(e) {}
+
+    function updateCard() {
+        var card = document.getElementById('card');
+        card.className = "card";
+        if (currentFilteredList.length === 0) {
+            document.getElementById('word-display').innerHTML = "No Words";
+            document.getElementById('meaning-display').innerHTML = "条件に合う単語がありません";
+            return;
+        }
+        var item = currentFilteredList[currentIndex];
+        
+        var frontText = isEnToJp ? item.word : item.meaning;
+        var backText = isEnToJp ? item.meaning : item.word;
+        var frontHint = isEnToJp ? "タップで日本語を確認" : "タップで英語を確認";
+
+        document.getElementById('word-display').innerHTML = frontText;
+        document.getElementById('meaning-display').innerHTML = backText;
+        document.getElementById('current-category').innerHTML = item.category + (masteredWords[item.word] ? " ✅" : "");
+        
+        var hintEls = document.getElementsByClassName('hint');
+        if (hintEls.length >= 2) {
+            hintEls[0].innerHTML = frontHint;
+        }
+    }
+
+    function updateProgress() {
+        var total = currentFilteredList.length;
+        if (total === 0) {
+            document.getElementById("progress-text").innerHTML = "0 / 0";
+            document.getElementById("progress-fill").style.width = "0%";
+            return;
+        }
+        document.getElementById("progress-text").innerHTML = (currentIndex + 1) + " / " + total;
+        var percent = ((currentIndex + 1) / total) * 100;
+        document.getElementById("progress-fill").style.width = percent + "%";
+    }
+
+    function filterData() {
+        var cat = document.getElementById("category-filter").value;
+        var onlyUnlearned = document.getElementById("unlearned-only").checked;
+        
+        var list = [];
+        for (var i = 0; i < vocabDataFull.length; i++) {
+            var item = vocabDataFull[i];
+            var matchCat = (cat === "all" || item.category === cat);
+            var matchLearn = (!onlyUnlearned || !masteredWords[item.word]);
+            if (matchCat && matchLearn) list.push(item);
+        }
+        currentFilteredList = list;
+        currentIndex = 0;
+        updateCard();
+        updateProgress();
+    }
+
+    var isInitialized = false;
+    function init() {
+        if (isInitialized) return;
+        var categories = [];
+        for (var i = 0; i < vocabDataFull.length; i++) {
+            var cat = vocabDataFull[i].category;
+            var found = false;
+            for (var j = 0; j < categories.length; j++) {
+                if (categories[j] === cat) { found = true; break; }
+            }
+            if (!found) categories.push(cat);
+        }
+        var filter = document.getElementById("category-filter");
+        filter.innerHTML = '<option value="all">すべて</option>';
+        for (var k = 0; k < categories.length; k++) {
+            var opt = document.createElement("option");
+            opt.value = categories[k];
+            opt.innerHTML = categories[k];
+            filter.appendChild(opt);
+        }
+        filterData();
+        isInitialized = true;
+    }
+
+    document.getElementById("card").onclick = function() {
+        this.className = (this.className === "card") ? "card is-flipped" : "card";
+    };
+
+    document.getElementById("next-btn").onclick = function() {
+        if (currentIndex < currentFilteredList.length - 1) {
+            currentIndex++;
+            updateCard();
+            updateProgress();
+        }
+    };
+
+    document.getElementById("prev-btn").onclick = function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateCard();
+            updateProgress();
+        }
+    };
+
+    document.getElementById("mode-btn").onclick = function() {
+        isEnToJp = !isEnToJp;
+        this.style.backgroundColor = isEnToJp ? "white" : "#e0e7ff";
+        updateCard();
+    };
+
+    document.getElementById("shuffle-btn").onclick = function() {
+        currentFilteredList.sort(function() { return 0.5 - Math.random(); });
+        currentIndex = 0;
+        updateCard();
+        updateProgress();
+    };
+
+    document.getElementById("reset-btn").onclick = function() {
+        currentIndex = 0;
+        filterData();
+    };
+
+    document.getElementById("category-filter").onchange = filterData;
+    document.getElementById("unlearned-only").onchange = filterData;
+
+    document.getElementById("clear-storage-btn").onclick = function() {
+        if (confirm("学習記録をすべてリセットしますか？")) {
+            masteredWords = {};
+            localStorage.removeItem('mastered_words');
+            filterData();
+        }
+    };
+
+    document.getElementById("mastered-btn").onclick = function() {
+        var self = this;
+        var item = currentFilteredList[currentIndex];
+        if (!item) return;
+
+        masteredWords[item.word] = true;
+        try {
+            localStorage.setItem('mastered_words', JSON.stringify(masteredWords));
+        } catch(e) {}
+
+        var defaultColor = self.style.backgroundColor;
+        self.style.backgroundColor = "#10b981";
+        updateCard(); // Update to show checkmark
+
+        setTimeout(function() {
+            self.style.backgroundColor = defaultColor;
+            
+            var onlyUnlearned = document.getElementById("unlearned-only").checked;
+            if (onlyUnlearned) {
+                // Remove from current list and stay or move
+                filterData();
+            } else {
+                if (currentIndex < currentFilteredList.length - 1) {
+                    currentIndex++;
+                    updateCard();
+                    updateProgress();
+                }
+            }
+        }, 300);
+    };
+
+    // Immediate Execution
+    init();
+    // Safety Fallback
+    window.onload = init;
+</script>
+</body>
+</html>
