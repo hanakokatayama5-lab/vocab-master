@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レッスンレポート - 高野先生</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --border: #E5E7EB;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), #818CF8);
+            color: white;
+            padding: 30px;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 0.95rem;
+        }
+
+        .alert-info {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            color: #3730A3;
+        }
+
+        .alert-success {
+            background-color: #ECFDF5;
+            border-left: 4px solid var(--success);
+            color: #065F46;
+        }
+
+        .conversation-box {
+            background-color: #F9FAFB;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
+
+        .correction {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .wrong {
+            color: var(--danger);
+            text-decoration: line-through;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .correct {
+            color: var(--success);
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+        }
+
+        .phrase-list {
+            list-style: none;
+        }
+
+        .phrase-list li {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .phrase-list li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .phrase-en {
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.02em;
+        }
+
+        .phrase-ja {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .tips {
+            background-color: #FFFBEB;
+            border: 1px solid #FDE68A;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #92400E;
+            display: inline-block;
+        }
+
+        .task-list {
+            list-style: none;
+            background-color: #F9FAFB;
+            border: 1px solid var(--border);
+            padding: 20px 20px 20px 35px;
+            border-radius: 12px;
+        }
+
+        .task-list li {
+            position: relative;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .task-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-list li::before {
+            content: '✓';
+            position: absolute;
+            left: -25px;
+            top: 2px;
+            background-color: var(--success);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .next-lesson {
+            background-color: var(--primary-light);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 30px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+            border: 2px dashed #A5B4FC;
+        }
+
+        .footer-msg {
+            text-align: center;
+            margin-top: 35px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 25px;
+            }
+            .header {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lesson Report</h1>
+            <p>2026年5月4日 | 高野先生</p>
+        </div>
+        
+        <div class="card">
+            <h2 class="section-title" style="margin-top: 0;">🗣️ Small Talk（スモールトーク）</h2>
+            <p style="font-size: 0.95rem; color: var(--text-muted);">今回のお忙しい近況について、英語でスモールトークに挑戦していただきました。</p>
+            
+            <div class="alert alert-success" style="margin-top: 15px;">
+                <span style="font-size: 1.2rem;">✨</span>
+                <div>
+                    <strong>素晴らしい点</strong><br>
+                    「No fine, very tired.」「I drive... listening English.」など、<strong>今の状況（疲れていること、運転中に聞いていること）を瞬時に単語で絞り出し、的確に相手に伝えられた点</strong>は素晴らしいコミュニケーション力です！外国人の患者さん対応でも、「とにかく知っている単語で伝える」という姿勢が一番大切になります。
+                </div>
+            </div>
+
+            <p style="margin-top: 25px; font-weight: 700; color: var(--primary);">📝 今後の課題とアドバイス</p>
+            <p style="font-size: 0.95rem; margin-top: 5px;">少し間が空いたため、言葉が単語の羅列になりがちでした。今後は少しずつ<strong>「主語(S) ＋ 動詞(V) ＋ 目的語(O)」の語順</strong>を意識して文を作る練習をしていきましょう。</p>
+
+            <div class="conversation-box">
+                <div class="correction">
+                    <span class="wrong">❌ No fine, very tired.</span>
+                    <span class="correct">⭕️ I am not doing fine. I'm very tired.</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">（あまり元気ではありません。とても疲れています。）</span>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 15px 0;">
+                <div class="correction">
+                    <span class="wrong">❌ I drive, driving, the drive do, listening English.</span>
+                    <span class="correct">⭕️ I listen to English while driving.</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">（運転中に英語を聞いています。）</span>
+                </div>
+            </div>
+
+            <h2 class="section-title">📚 今日のレッスン内容</h2>
+            <p style="font-size: 0.95rem; color: var(--text-muted);"><strong>「現場ですぐに使える即戦力英語」</strong>に絞ってレッスンを行いました。</p>
+
+            <h3 style="margin: 25px 0 15px; font-size: 1.1rem; color: var(--text-main); font-weight: 700;">1. 接骨院スキット（ロールプレイ）</h3>
+            <ul class="phrase-list">
+                <li>
+                    <div class="phrase-en">What seems to be the problem today?</div>
+                    <div class="phrase-ja">今日はどうされましたか？</div>
+                </li>
+                <li>
+                    <div class="phrase-en">Try not to sit for too long.</div>
+                    <div class="phrase-ja">長時間座らないように心がけてください。</div>
+                    <div class="tips">💡 ポイント： <code>not to + 動詞</code> で「〜しないようにする」というアドバイスになります。</div>
+                </li>
+                <li>
+                    <div class="phrase-en">Please move around a little during the day.</div>
+                    <div class="phrase-ja">日中は少し体を動かしてください。</div>
+                </li>
+                <li>
+                    <div class="phrase-en">If the pain gets worse, please come back.</div>
+                    <div class="phrase-ja">もし痛みがひどくなるなら、また来てください。</div>
+                </li>
+            </ul>
+
+            <div class="alert alert-info" style="margin-top: 20px;">
+                <span style="font-size: 1.2rem;">🗣️</span>
+                <div>
+                    <strong>発音のポイント</strong><br>
+                    <ul style="margin-left: 20px; font-size: 0.9rem; margin-top: 8px;">
+                        <li style="margin-bottom: 4px;"><strong>home</strong> は「ホーム（ho-mu）」ではなく「ホウム（houm）」</li>
+                        <li style="margin-bottom: 4px;"><strong>OK</strong> は「オーケー（ou-kei）」</li>
+                        <li><strong>a little</strong> は「ア・リドゥ」のようにDの音を意識すると一気にネイティブっぽくなります！</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 style="margin: 35px 0 15px; font-size: 1.1rem; color: var(--text-main); font-weight: 700;">2. 施術で使う鉄板フレーズ</h3>
+            <ul class="phrase-list">
+                <li>
+                    <div class="phrase-en">Where does it hurt?</div>
+                    <div class="phrase-ja">どこが痛いですか？</div>
+                </li>
+                <li>
+                    <div class="phrase-en">What makes it hurt?</div>
+                    <div class="phrase-ja">何をしたら痛いですか？（何が痛みを引き起こしていますか？）</div>
+                </li>
+                <li>
+                    <div class="phrase-en">How do you feel when you move that area?</div>
+                    <div class="phrase-ja">そこを動かすとどんな感じがしますか？</div>
+                </li>
+            </ul>
+
+            <h2 class="section-title">🎯 次回までの課題</h2>
+            <ul class="task-list">
+                <li><strong>スキット・フレーズの暗記</strong><br><span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">今日練習した会話文と、施術フレーズ3つ</span></li>
+                <li><strong>単語アプリの活用</strong><br><span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">「skip breakfast」の単語まで（約50個、聞き流しや復習メインでOKです）</span></li>
+                <li><strong>中学英語ドリル：3レッスン分</strong></li>
+            </ul>
+
+            <div class="next-lesson">
+                📅 次回レッスン：5月12日（火）17:00〜
+            </div>
+
+            <div class="footer-msg">
+                栄養のあるものをしっかり食べて、お身体に気をつけてお仕事頑張ってくださいね！<br>
+                次回もよろしくお願いいたします🌸
+            </div>
+        </div>
+    </div>
+</body>
+</html>
